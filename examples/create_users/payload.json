@@ -1,0 +1,6 @@
+{
+  "user": {
+    "name": "{{json:name}}",
+    "email": "{{json:email}}"
+  }
+}
