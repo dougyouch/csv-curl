@@ -30,9 +30,9 @@ csv-curl --csv emails.csv 'https://example.com/user_lookup?email={{param:email}}
 
 ### Replacement variables
 
-A replacement variable is enclosed in handlebars **{{** **format:** **name** **}}**.
+A replacement variable is enclosed in handlebars **{{** **format:** **name** **}}**.  Replacement variables can be used in the arguments to curl, in the template and in the utility.
 
-*(forman and name a separated by a colon)*
+*(format and name a separated by a colon)*
 
 - **name** matches a header in the CSV file
 - **format** escape sequence to apply the the replacement value
@@ -43,3 +43,13 @@ A replacement variable is enclosed in handlebars **{{** **format:** **name** **}
     - _hex_ Hex encode
     - _shell_ Shell encode
 
+Example: lookup users by email and save response by user id.
+
+```
+csv-curl --csv users.csv 'https://example.com/user_lookup?email={{param:email}}' --exec 'cat > {{id}}.json'
+
+# users.csv
+id,email
+5,bob@example.com
+8,johndoe@example.com
+```

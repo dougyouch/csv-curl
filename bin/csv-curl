@@ -161,4 +161,8 @@ while (row = input.shift)
     end
 
   puts output
+
+  File.unlink(response_file) if File.exist?(response_file)
 end
+
+File.unlink(TMP_REQUEST_BODY_FILE) if File.exist?(TMP_REQUEST_BODY_FILE)
