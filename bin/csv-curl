@@ -77,6 +77,8 @@ failed("missing replacement values for #{missing_replacements.join(', ')}", 2) u
 TMP_REQUEST_BODY_FILE = 'csv-utils.request'
 
 def format_value(value, format)
+  return '' unless value
+
   case format
   when 'json'
     value = value.to_json

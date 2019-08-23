@@ -16,7 +16,7 @@ File containing the payload to pass to the curl command, the "-d@<file>" option.
 
 ### CSV File
 
-A CSV file containing the replacement values to use.  It must have a header.  And have a header for all replacement values.
+A CSV file containing the replacement values to use.  It must have a header.  And have a header for all replacement variables.
 
 ### Utility
 
@@ -30,8 +30,16 @@ csv-curl --csv emails.csv 'https://example.com/user_lookup?email={{param:email}}
 
 ### Replacement variables
 
-A replacement variable is enclosed in handlebars *{{* *format:* *name* *}}*.
+A replacement variable is enclosed in handlebars **{{** **format:** **name** **}}**.
 
-*name* matches a header in the CSV file
-*format* escape sequence to apply the the replacement value
+*(forman and name a separated by a colon)*
+
+- **name** matches a header in the CSV file
+- **format** escape sequence to apply the the replacement value
+    - _json_ JSON encode
+    - _param_ URL encode
+    - _base64_ Base64 encode
+    - _urlsafe64_ URL safe Base64 encode
+    - _hex_ Hex encode
+    - _shell_ Shell encode
 
