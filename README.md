@@ -2,9 +2,15 @@
 
 Utility for making multiple curl requests using a CSV file.
 
+### Install
+
+```
+gem install csv-curl
+```
+
 ### Usage
 ```
-Usage: csv-curl[OPTIONS] [CURL OPTIONS]
+Usage: csv-curl [OPTIONS] [CURL OPTIONS]
         --template FILE              Path to the template file
         --csv CSV_FILE               Path to the CSV file
         --exec UTILITY               Utility to run on each response

@@ -16,7 +16,7 @@ options = {
 }
 
 OPTPARSE = OptionParser.new do |opts|
-  opts.banner = "Usage: " + File.basename(__FILE__) + "[OPTIONS] [CURL OPTIONS]"
+  opts.banner = "Usage: " + File.basename(__FILE__) + " [OPTIONS] [CURL OPTIONS]"
 
   opts.on('--template FILE', 'Path to the template file') do |v|
     options[:template_file] = v
@@ -38,6 +38,9 @@ ARGV.size.times.to_a.reverse.each do |idx|
        '--csv',
        '--exec'
     CSV_CURL_ARGV << ARGV.delete_at(idx)
+    CSV_CURL_ARGV << ARGV.delete_at(idx)
+  when '-h',
+       '--help'
     CSV_CURL_ARGV << ARGV.delete_at(idx)
   end
 end
