@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# requires: gem install schema-model
+
+# fetches users and flattens the JSON response to a CSV file
+csv-curl --csv input.csv 'https://example.com/users/{{id}}.json' -H 'Authorization: Bearer TOKEN' --exec 'schema-json2csv -r user_schema.rb --schema UserSchema --csv users.csv -'
+
