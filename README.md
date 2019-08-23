@@ -20,6 +20,18 @@ Usage: csv-curl [OPTIONS] [CURL OPTIONS]
 
 File containing the payload to pass to the curl command, the "-d@<file>" option.
 
+Example JSON template
+
+```
+{
+  "user": {
+    "name": "{{json:name}}",
+    "email": "{{json:email}}",
+    "external_id": {{external_id}}
+  }
+}
+```
+
 ### CSV File
 
 A CSV file containing the replacement values to use.  It must have a header.  And have a header for all replacement variables.
