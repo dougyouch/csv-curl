@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'csv-curl'
-  s.version     = '0.1.0'
+  s.version     = '0.2.0'
   s.licenses    = ['MIT']
   s.summary     = 'CSV Curl'
   s.description = 'Tools making mulitple calls using curl'

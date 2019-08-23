@@ -11,30 +11,51 @@ require 'digest/md5'
 options = {
   template_file: nil,
   csv_file: nil,
-  response_filter: nil,
+  exec: nil,
   default_format: 'json'
 }
 
-OptionParser.new do |opts|
-  opts.banner = "Usage: " + File.basename(__FILE__) + " [CURL OPTIONS]"
+OPTPARSE = OptionParser.new do |opts|
+  opts.banner = "Usage: " + File.basename(__FILE__) + "[OPTIONS] [CURL OPTIONS]"
 
-  opts.on('--template REQUEST', 'Request template') do |v|
+  opts.on('--template FILE', 'Path to the template file') do |v|
     options[:template_file] = v
   end
 
-  opts.on('--csv CSV_FILE', 'Request data') do |v|
+  opts.on('--csv CSV_FILE', 'Path to the CSV file') do |v|
     options[:csv_file] = v
   end
 
-  opts.on('--response-filter COMMAND', 'Command to run on each response') do |v|
-    options[:response_filter] = v
+  opts.on('--exec UTILITY', 'Utility to run on each response') do |v|
+    options[:exec] = v
   end
-end.parse!
+end
 
-raise('no csv input file specified') unless options[:csv_file]
-raise("csv input file #{options[:csv_file]} not found") unless File.exist?(options[:csv_file])
+CSV_CURL_ARGV = []
+ARGV.size.times.to_a.reverse.each do |idx|
+  case ARGV[idx]
+  when '--template',
+       '--csv',
+       '--exec'
+    CSV_CURL_ARGV << ARGV.delete_at(idx)
+    CSV_CURL_ARGV << ARGV.delete_at(idx)
+  end
+end
+OPTPARSE.parse(CSV_CURL_ARGV)
 
-raise("template file #{options[:template_file]} not found") if options[:template_file] && !File.exist?(options[:template_file])
+def failed(msg, errno = 1)
+  $stderr.puts msg
+  if errno == 1
+    puts ""
+    puts OPTPARSE
+  end
+  exit errno
+end
+
+failed('no csv input file specified') unless options[:csv_file]
+failed("csv input file #{options[:csv_file]} not found") unless File.exist?(options[:csv_file])
+
+failed("template file #{options[:template_file]} not found") if options[:template_file] && !File.exist?(options[:template_file])
 
 template = options[:template_file] ? File.read(options[:template_file]) : nil
 input = CSV.open(options[:csv_file])
@@ -44,14 +65,14 @@ required_replacements = ARGV.map do |arg|
   arg.scan(/\{\{(.*?)\}\}/)
 end
 
-required_replacements += options[:response_filter].scan(/\{\{(.*?)\}\}/) if options[:response_filter]
+required_replacements += options[:exec].scan(/\{\{(.*?)\}\}/) if options[:exec]
 required_replacements += template.scan(/\{\{(.*?)\}\}/) if template
 required_replacements.flatten!
 required_replacements.map! { |v| v.split(':', 2).last }
 required_replacements.uniq!
 
 missing_replacements = required_replacements - input_headers
-raise("missing replacement values for #{missing_replacements.join(', ')}") unless missing_replacements.empty?
+failed("missing replacement values for #{missing_replacements.join(', ')}", 2) unless missing_replacements.empty?
 
 TMP_REQUEST_BODY_FILE = 'csv-utils.request'
 
@@ -67,6 +88,8 @@ def format_value(value, format)
     CGI.escape(value)
   when 'base64'
     Base64.strict_encode64(value)
+  when 'urlsafe64'
+    Base64.urlsafe_encode64(value)
   when 'hex'
     value.unpack('H*').first
   when 'shellword',
@@ -92,7 +115,7 @@ end
 
 def run_command_safely(cmd)
   res = `#{cmd}`
-  raise("failed to run command: #{cmd}") unless $?.success?
+  failed("failed to run command: #{cmd}", 2) unless $?.success?
   res
 end
 
@@ -104,9 +127,9 @@ def build_curl_command(curl_args, data, request_file, response_file)
   cmd
 end
 
-def build_response_filter_command(response_filter, data, response_file)
+def build_exec_command(exec, data, response_file)
   cmd = "cat #{response_file} | "
-  cmd += generate_string(response_filter, data)
+  cmd += generate_string(exec, data)
   cmd
 end
 
@@ -128,8 +151,8 @@ while (row = input.shift)
   run_command_safely(cmd)
 
   output =
-    if options[:response_filter]
-      cmd = build_response_filter_command(options[:response_filter], data, response_file)
+    if options[:exec]
+      cmd = build_exec_command(options[:exec], data, response_file)
       run_command_safely(cmd)
     else
       File.read(response_file)

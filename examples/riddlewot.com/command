@@ -1,5 +1,5 @@
 #!/bin/bash
 
 # fetch riddles and output only the riddle
-csv-curl --csv riddles.csv 'https://www.riddlewot.com/includes/rgen.php?type={{param:type}}' --response-filter " jq '.riddle' -r"
+csv-curl --csv riddles.csv 'https://www.riddlewot.com/includes/rgen.php?type={{param:type}}' --exec " jq '.riddle' -r"
 

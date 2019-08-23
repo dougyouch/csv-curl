@@ -1,5 +1,5 @@
 #!/bin/bash
 
 # create users and save response to a <email>.json file
-csv-curl --template payload.json --csv users.csv https://example.com/users --response-filter 'cat > {{email}}.json'
+csv-curl --template payload.json --csv users.csv https://example.com/users --exec 'cat > {{email}}.json'
 
